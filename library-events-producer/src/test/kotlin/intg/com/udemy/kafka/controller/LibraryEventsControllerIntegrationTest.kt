@@ -57,7 +57,6 @@ class LibraryEventsControllerIntegrationTest {
         consumer.close()
     }
 
-
     @Test
     @Timeout(5)
     fun postLibraryEvent() {
