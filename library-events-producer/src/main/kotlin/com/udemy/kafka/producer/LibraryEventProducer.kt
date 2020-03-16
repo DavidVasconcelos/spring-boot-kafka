@@ -87,7 +87,7 @@ class LibraryEventProducer {
         var sendResult: SendResult<Int, String>
 
         sendResult = try {
-            kafkaTemplate.sendDefault(key, value).get(Companion.TIME_OF_DELAY, TimeUnit.SECONDS)
+            kafkaTemplate.sendDefault(key, value).get(TIME_OF_DELAY.toLong(), TimeUnit.SECONDS)
         } catch (ex: Exception) {
             when (ex) {
                 is ExecutionException, is InterruptedException -> {

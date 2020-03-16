@@ -29,6 +29,14 @@ dependencies {
 	testImplementation("org.springframework.kafka:spring-kafka-test")
 }
 
+kotlin {
+	sourceSets {
+		val test by getting {
+			kotlin.srcDirs("src/test/kotlin/unit","src/test/kotlin/intg")
+		}
+	}
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
