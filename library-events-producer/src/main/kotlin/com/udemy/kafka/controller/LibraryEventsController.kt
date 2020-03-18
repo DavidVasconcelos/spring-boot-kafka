@@ -24,6 +24,7 @@ class LibraryEventsController {
     fun postLibraryEvent(@RequestBody @Valid libraryEvent: LibraryEvent) : ResponseEntity<LibraryEvent> {
 
         libraryEvent.run { libraryEventType = LibraryEventType.NEW }
+        logger.info("Post message -> $libraryEvent")
         libraryEventProducer.sendLibraryEvent_Approach2(libraryEvent)
 
         return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent);

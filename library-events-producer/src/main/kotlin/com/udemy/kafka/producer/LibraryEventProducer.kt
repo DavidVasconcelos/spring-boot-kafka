@@ -7,10 +7,10 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
 import org.apache.logging.log4j.LogManager.getLogger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.SendResult
 import org.springframework.stereotype.Component
+import org.springframework.util.concurrent.ListenableFuture
 import org.springframework.util.concurrent.ListenableFutureCallback
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -22,8 +22,7 @@ class LibraryEventProducer {
 
     private val logger = getLogger(javaClass)
 
-    @Value("\${spring.kafka.template.default-topic}")
-    private lateinit var topic: String
+    private val topic = "library-events"
 
     @Autowired
     private lateinit var kafkaTemplate: KafkaTemplate<Int, String>
@@ -34,7 +33,7 @@ class LibraryEventProducer {
     @Throws(JsonProcessingException::class)
     fun sendLibraryEvent(libraryEvent: LibraryEvent) {
 
-        val key = libraryEvent.libraryEventId
+        val key = libraryEvent.libraryEventId!!
         val value = objectMapper.writeValueAsString(libraryEvent)
 
         val listenableFuture = kafkaTemplate
@@ -55,9 +54,9 @@ class LibraryEventProducer {
     }
 
     @Throws(JsonProcessingException::class)
-    fun sendLibraryEvent_Approach2(libraryEvent: LibraryEvent) {
+    fun sendLibraryEvent_Approach2(libraryEvent: LibraryEvent) : ListenableFuture<SendResult<Int, String>> {
 
-        val key = libraryEvent.libraryEventId
+        val key = libraryEvent.libraryEventId!!
         val value = objectMapper.writeValueAsString(libraryEvent)
 
         val producerRecord = buildProducerRecord(key, value, topic)
@@ -76,13 +75,15 @@ class LibraryEventProducer {
 
 
         })
+
+        return listenableFuture
     }
 
     @Throws(JsonProcessingException::class, ExecutionException::class, InterruptedException::class,
             TimeoutException::class)
     fun sendLibraryEventEventSynchronous(libraryEvent: LibraryEvent): SendResult<Int, String> {
 
-        val key = libraryEvent.libraryEventId
+        val key = libraryEvent.libraryEventId!!
         val value = objectMapper.writeValueAsString(libraryEvent)
         var sendResult: SendResult<Int, String>
 

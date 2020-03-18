@@ -58,7 +58,7 @@ class LibraryEventsControllerIntegrationTest {
     }
 
     @Test
-    @Timeout(5)
+    @Timeout(10)
     fun postLibraryEvent() {
 
         //given
