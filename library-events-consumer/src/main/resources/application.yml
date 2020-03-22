@@ -1,1 +1,64 @@
+server:
+  port: 8086
+
+spring:
+  profiles:
+    active: local
+
+---
+spring:
+  profiles: local
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:19092,localhost:29092,localhost:39092
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/kafkadb
+    username: root
+    password: MySql2020!
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+---
+spring:
+  profiles: dev
+  kafka:
+    consumer:
+      bootstrap-servers: dev:9093
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:3306/${MYSQL_DATABASE_NAME}
+    username: ${MYSQL_DATABASE_USERNAME}
+    password: ${MYSQL_DATABASE_PASSAWORD}
+    jpa:
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+
+---
+spring:
+  profiles: prod
+  kafka:
+    consumer:
+      bootstrap-servers: prod:9093
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:3306/${MYSQL_DATABASE_NAME}
+    username: ${MYSQL_DATABASE_USERNAME}
+    password: ${MYSQL_DATABASE_PASSAWORD}
+    jpa:
+      show-sql: true
+      hibernate:
+        ddl-auto: update
 
