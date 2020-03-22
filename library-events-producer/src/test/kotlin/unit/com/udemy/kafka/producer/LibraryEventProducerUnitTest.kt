@@ -83,7 +83,7 @@ class LibraryEventProducerUnitTest {
         val recordMetadata = RecordMetadata(TopicPartition("library-events", 1),
                 1, 1, 342, System.currentTimeMillis(), 1, 2)
 
-        val sendResult = SendResult<Int, String>(producerRecord, recordMetadata)
+        val sendResult = SendResult(producerRecord, recordMetadata)
         future.set(sendResult)
 
         every { kafkaTemplate.send(any<ProducerRecord<Int, String>>()) } returns future
