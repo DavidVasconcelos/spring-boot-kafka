@@ -23,6 +23,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 ---
 spring:

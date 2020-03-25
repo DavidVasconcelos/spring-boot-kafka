@@ -69,7 +69,6 @@ class LibraryEventsControllerIntegrationTest {
                 .build()
 
         val libraryEvent = LibraryEvent.Builder()
-                .libraryEventId(0)
                 .book(book)
                 .build()
 
@@ -85,7 +84,7 @@ class LibraryEventsControllerIntegrationTest {
         assertEquals(HttpStatus.CREATED, responseEntity.statusCode)
 
         val consumerRecord = KafkaTestUtils.getSingleRecord(consumer, topic)
-        val expectedRecord = "{\"libraryEventId\":0,\"libraryEventType\":\"NEW\",\"book\":{\"bookId\":123," +
+        val expectedRecord = "{\"libraryEventId\":null,\"libraryEventType\":\"NEW\",\"book\":{\"bookId\":123," +
                 "\"bookName\":\"Kafka using Spring Boot\",\"bookAuthor\":\"Dilip\"}}"
         val value = consumerRecord.value()
 

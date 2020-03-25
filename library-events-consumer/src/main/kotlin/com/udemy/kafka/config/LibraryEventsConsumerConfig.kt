@@ -1,4 +1,4 @@
-package com.udemy.kafka.libraryeventsconsumer.config
+package com.udemy.kafka.config
 
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer
 import org.springframework.context.annotation.Bean

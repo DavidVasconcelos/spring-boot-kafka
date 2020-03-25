@@ -1,19 +1,35 @@
-package com.udemy.kafka.domain
+package com.udemy.kafka.entity
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.google.gson.Gson
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import com.google.gson.GsonBuilder
+import com.google.gson.annotations.Expose
+import java.io.Serializable
+import javax.persistence.CascadeType
+import javax.persistence.Entity
+import javax.persistence.Enumerated
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.OneToOne
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-class LibraryEvent {
+@Entity
+class LibraryEvent : Serializable {
 
+    companion object {
+        private const val serialVersionUID = -97059332L
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose(serialize = true)
     var libraryEventId: Int? = null
 
+    @Enumerated
+    @Expose(serialize = true)
     var libraryEventType: LibraryEventType? = null
 
-    @NotNull
-    @Valid
+    @OneToOne(mappedBy = "libraryEvent", cascade = [CascadeType.ALL])
+    @Expose(serialize = false)
     var book: Book? = null
 
     private constructor(libraryEventId: Int?, libraryEventType: LibraryEventType?, book: Book?) {
@@ -54,7 +70,9 @@ class LibraryEvent {
     }
 
     override fun toString(): String {
-        return Gson().toJson(this)
+        return GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .create()
+                    .toJson(this)
     }
-
 }

@@ -1,4 +1,4 @@
-package com.udemy.kafka.libraryeventsconsumer
+package com.udemy.kafka
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

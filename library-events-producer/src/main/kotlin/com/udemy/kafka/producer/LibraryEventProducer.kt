@@ -56,7 +56,7 @@ class LibraryEventProducer {
     @Throws(JsonProcessingException::class)
     fun sendLibraryEvent_Approach2(libraryEvent: LibraryEvent) : ListenableFuture<SendResult<Int, String>> {
 
-        val key = libraryEvent.libraryEventId!!
+        val key = libraryEvent.libraryEventId
         val value = objectMapper.writeValueAsString(libraryEvent)
 
         val producerRecord = buildProducerRecord(key, value, topic)
@@ -107,7 +107,7 @@ class LibraryEventProducer {
 
     }
 
-    private fun buildProducerRecord(key: Int, value: String, topic: String): ProducerRecord<Int, String> {
+    private fun buildProducerRecord(key: Int?, value: String, topic: String): ProducerRecord<Int?, String> {
 
         val recordHeaders = arrayListOf(RecordHeader("event-source", "scanner".toByteArray()))
 
@@ -127,7 +127,7 @@ class LibraryEventProducer {
 
     }
 
-    private fun handleSuccess(key: Int, value: String?, result: SendResult<Int, String>?) {
+    private fun handleSuccess(key: Int?, value: String?, result: SendResult<Int, String>?) {
 
         logger.info("Message Sent SuccessFully for the key : $key and the value is $value , " +
                 "partition is ${result?.recordMetadata?.partition()}")

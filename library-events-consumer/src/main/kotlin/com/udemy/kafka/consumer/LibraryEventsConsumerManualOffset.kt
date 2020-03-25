@@ -1,4 +1,4 @@
-package com.udemy.kafka.libraryeventsconsumer.consumer
+package com.udemy.kafka.consumer
 
 import com.google.gson.Gson
 import org.apache.kafka.clients.consumer.ConsumerRecord

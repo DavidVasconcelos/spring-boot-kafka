@@ -42,7 +42,6 @@ class LibraryEventProducerUnitTest {
                 .build()
 
         val libraryEvent = LibraryEvent.Builder()
-                .libraryEventId(0)
                 .book(book)
                 .build()
 
@@ -71,7 +70,6 @@ class LibraryEventProducerUnitTest {
                 .build()
 
         val libraryEvent = LibraryEvent.Builder()
-                .libraryEventId(0)
                 .book(book)
                 .build()
 
