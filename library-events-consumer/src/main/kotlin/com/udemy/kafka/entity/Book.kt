@@ -29,7 +29,7 @@ class Book : Serializable {
     @OneToOne
     @JoinColumn(name = "libraryEventId")
     @Expose(serialize = false)
-    lateinit var libraryEvent: LibraryEvent
+    var libraryEvent: LibraryEvent? = null
 
     private constructor(bookId: Int?, bookName: String?, bookAuthor: String?) {
         this.bookId = bookId

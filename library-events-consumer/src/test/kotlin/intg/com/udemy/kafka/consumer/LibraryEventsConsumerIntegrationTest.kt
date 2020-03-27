@@ -1,7 +1,10 @@
 package com.udemy.kafka.consumer
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.SpykBean
+import com.udemy.kafka.entity.Book
 import com.udemy.kafka.entity.LibraryEvent
+import com.udemy.kafka.entity.LibraryEventType
 import com.udemy.kafka.repository.LibraryEventsRepository
 import com.udemy.kafka.service.LibraryEventsService
 import io.mockk.verify
@@ -45,6 +48,8 @@ class LibraryEventsConsumerIntegrationTest {
 
     @Autowired
     private lateinit var libraryEventsRepository: LibraryEventsRepository
+
+    val objectMapper = ObjectMapper()
 
     @Container
     private val container: MySQLContainer<Nothing> = MySQLContainer<Nothing>("mysql:5.7")
@@ -97,9 +102,53 @@ class LibraryEventsConsumerIntegrationTest {
         assert(libraryEventList.count() == 1)
         libraryEventList.forEach { libraryEvent: LibraryEvent? ->
             libraryEvent?.libraryEventId ?: fail(message = "libraryEventId was null")
-            assertEquals(456,  libraryEvent?.book?.bookId)
+            assertEquals(456, libraryEvent.book?.bookId)
         }
     }
 
+    @Test
+    fun publishUpdateLibraryEvent() {
 
+        //given
+        val json = "{\"libraryEventId\":null,\"libraryEventType\":\"NEW\",\"book\":{\"bookId\":456," +
+                "\"bookName\":\"Kafka Using Spring Boot\",\"bookAuthor\":\"Dilip\"}}"
+
+        val libraryEvent = objectMapper.readValue(json, LibraryEvent::class.java)
+        libraryEvent.book?.libraryEvent = libraryEvent
+        libraryEventsRepository.save(libraryEvent)
+
+        //publish the update LibraryEvent
+        val updatedBook = Book.Builder()
+                .bookId(456)
+                .bookName("Kafka Using Spring Boot 2.x")
+                .bookAuthor("Dilip")
+                .build()
+
+        libraryEvent.libraryEventType = LibraryEventType.UPDATE
+        libraryEvent.book = updatedBook
+
+        val updatedJson = objectMapper.writeValueAsString(libraryEvent)
+
+        libraryEvent.libraryEventId?.let {
+            kafkaTemplate.sendDefault(it, updatedJson)
+        }
+
+        //when
+        var latch = CountDownLatch(1)
+        latch.await(3, TimeUnit.SECONDS)
+
+
+        //then
+        verify(exactly = 1) { libraryEventsConsumerSpy.onMessage(any()) }
+        verify(exactly = 1) { libraryEventsServiceSpy.processLibraryEvent(any()) }
+
+        libraryEvent.libraryEventId?.let {
+            val persistedLibraryEvent = libraryEventsRepository.findById(it).get()
+
+            assertEquals("Kafka Using Spring Boot 2.x", persistedLibraryEvent.book?.bookName)
+
+        }
+
+
+    }
 }
