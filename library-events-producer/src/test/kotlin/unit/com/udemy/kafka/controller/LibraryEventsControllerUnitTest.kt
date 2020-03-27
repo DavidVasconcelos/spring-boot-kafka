@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.udemy.kafka.domain.Book
 import com.udemy.kafka.domain.LibraryEvent
-import com.udemy.kafka.producer.LibraryEventProducer
+import com.udemy.kafka.producer.LibraryEventsProducer
 import com.udemy.kafka.util.ID_NULL_ON_UPDATE_MESSAGE_ERROR
 import io.mockk.every
 import org.junit.jupiter.api.Test
@@ -18,13 +18,13 @@ import org.springframework.test.web.servlet.put
 
 @WebMvcTest(LibraryEventsController::class)
 @AutoConfigureMockMvc
-class LibraryEventControllerUnitTest {
+class LibraryEventsControllerUnitTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockkBean
-    private lateinit var libraryEventProducer: LibraryEventProducer
+    private lateinit var libraryEventsProducer: LibraryEventsProducer
 
     val objectMapper = ObjectMapper()
 
@@ -44,7 +44,7 @@ class LibraryEventControllerUnitTest {
 
         val json = objectMapper.writeValueAsString(libraryEvent)
 
-       every { libraryEventProducer.sendLibraryEvent_Approach2(any()).get() } returns null
+       every { libraryEventsProducer.sendLibraryEvent_Approach2(any()).get() } returns null
 
         //expect
         mockMvc.post("/v1/libraryevent") {
@@ -72,7 +72,7 @@ class LibraryEventControllerUnitTest {
 
         val json = objectMapper.writeValueAsString(libraryEvent)
 
-        every { libraryEventProducer.sendLibraryEvent_Approach2(any()).get() } returns null
+        every { libraryEventsProducer.sendLibraryEvent_Approach2(any()).get() } returns null
 
         //expect
         mockMvc.post("/v1/libraryevent") {
@@ -104,7 +104,7 @@ class LibraryEventControllerUnitTest {
 
         val json = objectMapper.writeValueAsString(libraryEvent)
 
-        every { libraryEventProducer.sendLibraryEvent_Approach2(any()).get() } returns null
+        every { libraryEventsProducer.sendLibraryEvent_Approach2(any()).get() } returns null
 
         //expect
         mockMvc.put("/v1/libraryevent") {
@@ -132,7 +132,7 @@ class LibraryEventControllerUnitTest {
 
         val json = objectMapper.writeValueAsString(libraryEvent)
 
-        every { libraryEventProducer.sendLibraryEvent_Approach2(any()).get() } returns null
+        every { libraryEventsProducer.sendLibraryEvent_Approach2(any()).get() } returns null
 
         //expect
         mockMvc.put("/v1/libraryevent") {

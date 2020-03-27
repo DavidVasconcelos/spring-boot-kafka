@@ -7,6 +7,7 @@ import com.udemy.kafka.repository.LibraryEventsRepository
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -25,9 +26,9 @@ class LibraryEventsService {
         val libraryEvent = objectMapper.readValue(consumerRecord.value(), LibraryEvent::class.java)
         logger.info("LibraryEvent: $libraryEvent")
 
-        when(libraryEvent.libraryEventType) {
+        when (libraryEvent.libraryEventType) {
             LibraryEventType.NEW -> save(libraryEvent)
-            LibraryEventType.UPDATE -> Unit
+            LibraryEventType.UPDATE -> libraryEvent.apply { validate(this) }.also { save(it) }
             else -> logger.info("Invalid Library Event Type")
 
         }
@@ -39,8 +40,12 @@ class LibraryEventsService {
         libraryEvent.book?.libraryEvent = libraryEvent
         libraryEventsRepository.save(libraryEvent)
         logger.info("Successfully Persisted the libary Event: $libraryEvent")
+    }
 
+    private fun validate(libraryEvent: LibraryEvent) {
 
-
+        val id = libraryEvent.libraryEventId ?: throw IllegalArgumentException("Library Event Id is missing")
+        libraryEventsRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("Not a valid library Event")
+        logger.info("Validation is successful for the library Event : $libraryEvent");
     }
 }

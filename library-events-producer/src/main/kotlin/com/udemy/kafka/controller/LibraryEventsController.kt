@@ -2,7 +2,7 @@ package com.udemy.kafka.controller
 
 import com.udemy.kafka.domain.LibraryEvent
 import com.udemy.kafka.domain.LibraryEventType
-import com.udemy.kafka.producer.LibraryEventProducer
+import com.udemy.kafka.producer.LibraryEventsProducer
 import com.udemy.kafka.util.ID_NULL_ON_UPDATE_MESSAGE_ERROR
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,14 +20,14 @@ class LibraryEventsController {
     private val logger = LogManager.getLogger(javaClass)
 
     @Autowired
-    private lateinit var libraryEventProducer: LibraryEventProducer
+    private lateinit var libraryEventsProducer: LibraryEventsProducer
 
     @PostMapping("/v1/libraryevent")
     fun postLibraryEvent(@RequestBody @Valid libraryEvent: LibraryEvent) : ResponseEntity<LibraryEvent> {
 
         libraryEvent.run { libraryEventType = LibraryEventType.NEW }
         logger.info("Post message -> $libraryEvent")
-        libraryEventProducer.sendLibraryEvent_Approach2(libraryEvent)
+        libraryEventsProducer.sendLibraryEvent_Approach2(libraryEvent)
 
         return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent)
     }
@@ -40,7 +40,7 @@ class LibraryEventsController {
 
         libraryEvent.run { libraryEventType = LibraryEventType.UPDATE }
         logger.info("Put message -> $libraryEvent")
-        libraryEventProducer.sendLibraryEvent_Approach2(libraryEvent)
+        libraryEventsProducer.sendLibraryEvent_Approach2(libraryEvent)
 
         return ResponseEntity.status(HttpStatus.OK).body(libraryEvent)
     }

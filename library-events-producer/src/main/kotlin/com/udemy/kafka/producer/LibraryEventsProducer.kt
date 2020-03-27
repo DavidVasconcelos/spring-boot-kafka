@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException
 
 
 @Component
-class LibraryEventProducer {
+class LibraryEventsProducer {
 
     private val logger = getLogger(javaClass)
 

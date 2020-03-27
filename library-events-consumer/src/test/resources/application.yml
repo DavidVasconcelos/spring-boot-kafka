@@ -1,0 +1,30 @@
+spring:
+  profiles:
+    active: local
+
+---
+spring:
+  profiles: local
+  kafka:
+    template:
+      default-topic: library-events
+    consumer:
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+    producer:
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    jpa:
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+      database: mysql
+      database-platform: org.hibernate.dialect.MySQL5InnoDBDialect

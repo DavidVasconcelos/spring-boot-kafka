@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import java.util.stream.Collectors
 
 @ControllerAdvice
-class LibraryEventControllerAdvice {
+class LibraryEventsControllerAdvice {
 
     private val logger = LogManager.getLogger(javaClass)
 

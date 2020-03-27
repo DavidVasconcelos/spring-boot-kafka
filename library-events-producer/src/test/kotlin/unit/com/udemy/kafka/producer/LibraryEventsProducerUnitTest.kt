@@ -20,13 +20,13 @@ import org.springframework.kafka.support.SendResult
 import org.springframework.util.concurrent.SettableListenableFuture
 
 @ExtendWith(MockKExtension::class)
-class LibraryEventProducerUnitTest {
+class LibraryEventsProducerUnitTest {
 
     @MockK
     private lateinit var kafkaTemplate: KafkaTemplate<Int, String>
 
     @OverrideMockKs
-    var eventProducer: LibraryEventProducer = LibraryEventProducer()
+    var eventsProducer: LibraryEventsProducer = LibraryEventsProducer()
 
     @SpyK
     private var objectMapper = ObjectMapper()
@@ -54,7 +54,7 @@ class LibraryEventProducerUnitTest {
         //when
         //then
         assertThrows<Exception> {
-            eventProducer.sendLibraryEvent_Approach2(libraryEvent).get()
+            eventsProducer.sendLibraryEvent_Approach2(libraryEvent).get()
         }
 
     }
@@ -87,7 +87,7 @@ class LibraryEventProducerUnitTest {
         every { kafkaTemplate.send(any<ProducerRecord<Int, String>>()) } returns future
 
         //when
-        val sendResultReturned = eventProducer.sendLibraryEvent_Approach2(libraryEvent).get()
+        val sendResultReturned = eventsProducer.sendLibraryEvent_Approach2(libraryEvent).get()
 
         //then
         assertEquals(sendResultReturned.recordMetadata.partition(), 1)
