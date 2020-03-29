@@ -8,10 +8,13 @@ import com.udemy.kafka.entity.LibraryEventType
 import com.udemy.kafka.repository.LibraryEventsRepository
 import com.udemy.kafka.service.LibraryEventsService
 import io.mockk.verify
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -29,6 +32,7 @@ import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 @EmbeddedKafka(topics = ["library-events"], partitions = 3)
+@TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 class LibraryEventsConsumerIntegrationTest {
 
     @Autowired
@@ -66,7 +70,7 @@ class LibraryEventsConsumerIntegrationTest {
             }
 
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
 
         for (messageListenerContainer in endpointRegistry.listenerContainers) {
@@ -75,10 +79,15 @@ class LibraryEventsConsumerIntegrationTest {
 
     }
 
-    @AfterEach
+    @AfterAll
     fun tearDown() {
         embeddedKafkaBroker.kafkaServers.forEach { b -> b.shutdown() }
         embeddedKafkaBroker.kafkaServers.forEach { b -> b.awaitShutdown() }
+    }
+
+    @AfterEach
+    fun cleanDataBase() {
+        libraryEventsRepository.deleteAll()
     }
 
     @Test
@@ -149,6 +158,68 @@ class LibraryEventsConsumerIntegrationTest {
 
         }
 
+    }
+
+    @Test
+    fun publishModifyLibraryEventNotAValidLibraryEventId() {
+
+        //given
+        val libraryEventId = 123
+        val json = "{\"libraryEventId\":$libraryEventId,\"libraryEventType\":\"UPDATE\",\"book\":{\"bookId\":456," +
+                "\"bookName\":\"Kafka Using Spring Boot\",\"bookAuthor\":\"Dilip\"}}"
+
+        kafkaTemplate.sendDefault(json).get()
+
+        //when
+        var latch = CountDownLatch(1)
+        latch.await(3, TimeUnit.SECONDS)
+
+        //then
+        verify(exactly = 1) { libraryEventsConsumerSpy.onMessage(any()) }
+        verify(exactly = 1) { libraryEventsServiceSpy.processLibraryEvent(any()) }
+
+        val persistedLibraryEvent = libraryEventsRepository.findById(libraryEventId)
+        assertFalse(persistedLibraryEvent.isPresent)
+    }
+
+    @Test
+    fun publishModifyLibraryEventNullLibraryEventId() {
+
+        //given
+        val libraryEventId = null
+        val json = "{\"libraryEventId\":$libraryEventId,\"libraryEventType\":\"UPDATE\",\"book\":{\"bookId\":456," +
+                "\"bookName\":\"Kafka Using Spring Boot\",\"bookAuthor\":\"Dilip\"}}"
+
+        kafkaTemplate.sendDefault(json).get()
+
+        //when
+        var latch = CountDownLatch(1)
+        latch.await(3, TimeUnit.SECONDS)
+
+        //then
+        verify(exactly = 1) { libraryEventsConsumerSpy.onMessage(any()) }
+        verify(exactly = 1) { libraryEventsServiceSpy.processLibraryEvent(any()) }
+
+    }
+
+    @Test
+    fun publishModifyLibraryEventZerolLibraryEventId() {
+
+        //given
+        val libraryEventId = 0
+        val json = "{\"libraryEventId\":$libraryEventId,\"libraryEventType\":\"UPDATE\",\"book\":{\"bookId\":456," +
+                "\"bookName\":\"Kafka Using Spring Boot\",\"bookAuthor\":\"Dilip\"}}"
+
+        kafkaTemplate.sendDefault(json).get()
+
+        //when
+        var latch = CountDownLatch(1)
+        latch.await(3, TimeUnit.SECONDS)
+
+        //then
+        //verify(exactly = 4) { libraryEventsConsumerSpy.onMessage(any()) }
+        verify(exactly = 4) { libraryEventsServiceSpy.processLibraryEvent(any()) }
+        verify(exactly = 1) { libraryEventsServiceSpy.handleRecovery(any()) }
 
     }
 }
